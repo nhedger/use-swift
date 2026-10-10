@@ -1,0 +1,64 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm check
+      - run: pnpm typecheck
+      - run: pnpm test
+      - run: pnpm build
+      - run: git diff --exit-code -- dist
+
+  install:
+    needs: check
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        version: [latest, "6.2.1", main-snapshot]
+        include:
+          - os: ubuntu-24.04-arm
+            version: latest
+          - os: macos-15-intel
+            version: latest
+          - os: windows-11-arm
+            version: latest
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v5
+      - name: Create a conflicting project version
+        shell: bash
+        run: echo '0.0.0' > .swift-version
+      - uses: ./
+        id: swift
+        with:
+          version: ${{ matrix.version }}
+      - name: Verify compiler and environment in a subsequent step
+        shell: bash
+        env:
+          INSTALLED_VERSION: ${{ steps.swift.outputs.version }}
+        run: |
+          test -n "$INSTALLED_VERSION"
+          swift --version | grep -F "Swift version ${INSTALLED_VERSION%.0}"
+          test "$(cat .swift-version)" = '0.0.0'
+          if [ "$RUNNER_OS" != 'Windows' ]; then swiftly --version; fi
+          mkdir smoke
+          cd smoke
+          swift package init --type executable
+          swift run

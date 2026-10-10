@@ -1,0 +1,17 @@
+name: Use Swift
+description: Setup the Swift toolchain on GitHub Actions.
+author: nhedger
+inputs:
+  version:
+    description: The Swift version or development snapshot identifier to use.
+    required: false
+    default: "latest"
+outputs:
+  version:
+    description: The installed compiler version (for example, 6.2.1 or 6.5-dev).
+runs:
+  using: "node24"
+  main: "dist/index.mjs"
+branding:
+  color: "orange"
+  icon: "command"

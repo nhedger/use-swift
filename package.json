@@ -1,0 +1,38 @@
+{
+	"name": "use-swift",
+	"version": "1.0.0",
+	"description": "A cross-platform GitHub Action to setup the Swift toolchain.",
+	"scripts": {
+		"build": "rolldown -c",
+		"check": "biome check src test package.json tsconfig.json rolldown.config.ts",
+		"typecheck": "tsc",
+		"test": "node --test test/*.test.ts"
+	},
+	"keywords": [
+		"swift",
+		"swiftly"
+	],
+	"author": "Nicolas Hedger <nicolas@hedger.ch>",
+	"license": "MIT",
+	"devEngines": {
+		"packageManager": {
+			"name": "pnpm",
+			"version": "12.10.1",
+			"onFail": "download"
+		}
+	},
+	"packageManager": "pnpm@12.10.1",
+	"type": "module",
+	"devDependencies": {
+		"@biomejs/biome": "^2.5.15",
+		"@types/node": "^24.19.2",
+		"rolldown": "^1.2.13",
+		"typescript": "^7.0.2"
+	},
+	"dependencies": {
+		"@actions/core": "^3.0.1",
+		"@actions/exec": "^3.0.0",
+		"@actions/http-client": "^4.0.1",
+		"@actions/tool-cache": "^4.0.0"
+	}
+}
