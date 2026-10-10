@@ -38,14 +38,20 @@ test("latest selects numerically, ignores non-Windows releases and filters archi
 	assert.match(arm64.url, /\/windows10-arm64\/.*-windows10-arm64\.exe$/);
 });
 
-test("minor selectors choose the latest patch without crossing minor versions", async () => {
+test("6.1 selects the latest patch without crossing minor versions", async () => {
 	const download = await windowsDownload(
-		"6.2",
+		"6.1",
 		"x64",
-		api([release("6.2"), release("6.2.9"), release("6.2.10"), release("6.20")]),
+		api([
+			release("6.2"),
+			release("6.1.10"),
+			release("6.1"),
+			release("6.10"),
+			release("6.1.9"),
+		]),
 	);
 
-	assert.equal(download.version, "6.2.10");
+	assert.equal(download.version, "6.1.10");
 });
 
 test("explicit patch zero preserves the official release tag's spelling", async () => {
